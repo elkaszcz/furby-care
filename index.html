@@ -295,6 +295,114 @@
     margin-top: 8px;
   }
 
+  /* Toilet request icon */
+  #toilet-request {
+    display: none;
+    position: absolute;
+    bottom: 30px;
+    right: 40px;
+    z-index: 15;
+    font-size: 36px;
+    background: rgba(241, 196, 15, 0.15);
+    border: 3px solid #f1c40f;
+    border-radius: 50%;
+    width: 65px;
+    height: 65px;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    transition: all 0.2s;
+  }
+  #toilet-request.show { display: flex; animation: toilet-need-pulse 0.6s ease infinite; }
+  #toilet-request:hover { background: rgba(241, 196, 15, 0.3); transform: scale(1.1); }
+  #toilet-request .countdown {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    color: #e74c3c;
+    margin-top: 2px;
+  }
+  @keyframes toilet-need-pulse {
+    0%,100% { box-shadow: 0 0 8px rgba(241,196,15,0.3); }
+    50% { box-shadow: 0 0 25px rgba(241,196,15,0.7); }
+  }
+
+  /* Poop indicator */
+  #poop-indicator {
+    display: none;
+    position: absolute;
+    right: 120px;
+    bottom: 60px;
+    z-index: 15;
+  }
+  #poop-indicator.show { display: block; }
+  .poop-emoji { font-size: 90px; }
+  .fly {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #333;
+    border-radius: 50%;
+    top: 40px;
+    left: 40px;
+    animation: fly-buzz 1.5s ease-in-out infinite;
+  }
+  .fly:nth-child(2) { animation-duration: 1.2s; }
+  .fly:nth-child(3) { animation-duration: 1.6s; animation-delay: 0.2s; }
+  .fly:nth-child(4) { animation-duration: 1.0s; animation-delay: 0.4s; }
+  .fly:nth-child(5) { animation-duration: 1.4s; animation-delay: 0.6s; }
+  .fly:nth-child(6) { animation-duration: 1.8s; animation-delay: 0.1s; }
+  @keyframes fly-buzz {
+    0%,100% { transform: translate(0, 0); }
+    10% { transform: translate(40px, -30px); }
+    25% { transform: translate(-25px, -45px); }
+    40% { transform: translate(45px, 15px); }
+    55% { transform: translate(-35px, 30px); }
+    70% { transform: translate(30px, -40px); }
+    85% { transform: translate(-45px, -10px); }
+  }
+
+  /* Clean button */
+  #clean-btn {
+    display: none;
+    position: absolute;
+    bottom: 30px;
+    right: 40px;
+    z-index: 15;
+    font-size: 22px;
+    font-family: 'Press Start 2P', monospace;
+    background: linear-gradient(180deg, #27ae60, #1e8449);
+    border: 3px solid #2ecc71;
+    border-radius: 15px;
+    color: white;
+    padding: 10px 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #145a32, 0 0 15px rgba(46,204,113,0.3);
+    animation: toilet-need-pulse 0.8s ease infinite;
+  }
+  #clean-btn.show { display: block; }
+  #clean-btn:hover { background: linear-gradient(180deg, #2ecc71, #27ae60); transform: translateY(-2px); }
+  #clean-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #145a32; }
+  #clean-btn .btn-label { display: block; font-size: 7px; margin-top: 4px; }
+
+  /* Skull tattoo */
+  #skull-tattoo {
+    display: none;
+    position: absolute;
+    top: 200px;
+    left: 165px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  #skull-tattoo.show { display: block; }
+  #skull-tattoo img {
+    width: 36px;
+    height: 40px;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+  }
+  #skull-tattoo.show img { opacity: 0.85; }
+
   /* Stat bars */
   .stat-bar.bladder { background: linear-gradient(90deg, #f39c12, #f1c40f); }
   .stat-bar.tiredness { background: linear-gradient(90deg, #9b59b6, #c39bd3); }
@@ -379,7 +487,7 @@
   }
   .action-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #2a0d4a; }
   .action-btn .btn-label { display: block; font-size: 8px; margin-top: 5px; color: #cba6f7; }
-  .action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+  .action-btn:disabled, .action-btn.cooldown { opacity: 0.4; cursor: not-allowed; transform: none !important; }
   /* Particles */
   .particle {
     position: absolute; font-size: 18px; pointer-events: none; z-index: 20;
@@ -565,6 +673,7 @@
         </g>
 
       </svg>
+      <div id="skull-tattoo"><img id="tattoo-skull" src="skull.svg" alt="skull tattoo"><img id="tattoo-heart" src="heart-tattoo.svg" alt="heart tattoo" style="display:none"></div>
     </div>
 
     <div id="zzz-container">
@@ -582,6 +691,25 @@
       <div class="sfx-bubbles" id="toilet-sfx"></div>
       <div class="thought-bubble" id="toilet-thought"></div>
     </div>
+
+    <div id="toilet-request" onclick="takeToToilet()">
+      🚽
+      <span class="countdown" id="toilet-countdown"></span>
+    </div>
+
+    <div id="poop-indicator">
+      <span class="poop-emoji">💩</span>
+      <span class="fly"></span>
+      <span class="fly"></span>
+      <span class="fly"></span>
+      <span class="fly"></span>
+      <span class="fly"></span>
+    </div>
+
+    <button id="clean-btn" onclick="cleanPoop()">
+      🧹
+      <span class="btn-label">Clean</span>
+    </button>
 
     <div id="game-over">
       <h2>Furby moved out!</h2>
@@ -728,6 +856,16 @@ function furbyReliefSound() {
   playTone(400, 0.4, 'sine', 0.08, -50, 3, 10, 0.3);
   playTone(600, 0.15, 'sine', 0.10, 200, 20, 30, 0.7);
 }
+function furbyBuzzSound() {
+  playTone(120, 0.15, 'sawtooth', 0.04, 30, 45, 15, 0);
+  playTone(180, 0.1, 'square', 0.03, -20, 55, 20, 0.05);
+  playTone(140, 0.12, 'sawtooth', 0.03, 15, 50, 12, 0.1);
+}
+function furbyPoopSound() {
+  playTone(150, 0.2, 'sine', 0.10, -80, 8, 30, 0);
+  playTone(200, 0.15, 'sawtooth', 0.06, -100, 12, 20, 0.1);
+  playTone(100, 0.3, 'sine', 0.08, 50, 5, 15, 0.2);
+}
 
 // ===== NEW ROOM SOUNDS =====
 function furbyWashSound() {
@@ -794,6 +932,12 @@ let isLeaving = false;
 let isOnToilet = false;
 let isSleeping = false;
 let bladderPressure = 0;
+let needsToilet = false;
+let toiletRequestTime = 0;
+let isPooped = false;
+let buzzInterval = null;
+const TOILET_TIMEOUT = 10;
+let hasSkullTattoo = false;
 let tiredness = 0;
 let tiredDemandTimer = 0;
 let demandingSleep = false;
@@ -810,6 +954,7 @@ const TIREDNESS_FILL_RATE = 1.0; // per second
 const TIRED_THRESHOLD = 80;
 const TIRED_DEMAND_TIME = 20; // seconds at high tiredness before demanding
 const SLEEP_RECOVERY_RATE = 5; // tiredness drop per second while sleeping
+const SKULL_TATTOO_TIME = 15; // seconds love must stay low before skull appears
 
 const wrap = document.getElementById('furby-wrap');
 const suitcase = document.getElementById('suitcase-group');
@@ -830,7 +975,7 @@ function blink() {
 
 // ===== ROOM SWITCHING =====
 function switchRoom(room) {
-  if (isSleeping || isOnToilet || isLeaving || gameOver) return;
+  if (isSleeping || isOnToilet || isLeaving || gameOver || isPooped) return;
   if (demandingSleep && room !== 'bedroom') return;
   currentRoom = room;
 
@@ -924,6 +1069,59 @@ function updateBladderBar() {
   bar.classList.toggle('low', bladderPressure > 70);
 }
 
+// ===== TOILET REQUEST & POOP =====
+function showToiletRequest() {
+  if (needsToilet || isOnToilet || isPooped || isLeaving || gameOver || isSleeping) return;
+  needsToilet = true;
+  toiletRequestTime = TOILET_TIMEOUT;
+  document.getElementById('toilet-request').classList.add('show');
+  document.getElementById('toilet-countdown').textContent = Math.ceil(toiletRequestTime);
+  showSpeech('potty');
+  furbyToiletSound();
+}
+
+function takeToToilet() {
+  if (!needsToilet) return;
+  needsToilet = false;
+  toiletRequestTime = 0;
+  document.getElementById('toilet-request').classList.remove('show');
+  triggerToiletBreak();
+}
+
+function poopAccident() {
+  if (isLeaving || gameOver) { needsToilet = false; return; }
+  needsToilet = false;
+  toiletRequestTime = 0;
+  isPooped = true;
+  bladderPressure = 0;
+  updateBladderBar();
+  document.getElementById('toilet-request').classList.remove('show');
+  document.getElementById('poop-indicator').classList.add('show');
+  document.getElementById('clean-btn').classList.add('show');
+  furbyPoopSound();
+  showSpeech('pooped');
+
+  document.querySelectorAll('.action-btn').forEach(b => b.disabled = true);
+
+  buzzInterval = setInterval(() => {
+    if (!isPooped) return;
+    furbyBuzzSound();
+  }, 2000);
+  furbyBuzzSound();
+}
+
+function cleanPoop() {
+  if (!isPooped) return;
+  isPooped = false;
+  document.getElementById('poop-indicator').classList.remove('show');
+  document.getElementById('clean-btn').classList.remove('show');
+  if (buzzInterval) { clearInterval(buzzInterval); buzzInterval = null; }
+
+  document.querySelectorAll('.action-btn').forEach(b => b.disabled = false);
+  showSpeech('happy');
+  furbyReliefSound();
+}
+
 function updateTiredBar() {
   const bar = document.getElementById('tired-bar');
   const val = document.getElementById('tired-val');
@@ -986,6 +1184,7 @@ const phrases = {
   drinking: ["Glug glug!", "Ahh~!", "So fresh!"],
   petting: ["Ooh!", "Me like!", "Hee hee!", "Purrrr~"],
   potty: ["Gotta go!!", "Uh oh..!", "Potty time!", "Hurry!!"],
+  pooped: ["Oh no..!", "Oopsie!", "Stinky...", "Help me!", "Eww..."],
   washing: ["Splashy!", "Bubbles!", "So clean!", "Wheee!"],
   hairdress: ["Pretty!", "Fancy!", "Ooh nice!", "Fabulous!"],
   brushing: ["Shiny!", "Sparkle!", "Ahh!", "Fresh!"],
@@ -1017,8 +1216,16 @@ function spawnParticle(emoji) {
 }
 
 // ===== ACTIONS =====
+let lastActionTime = 0;
+const ACTION_COOLDOWN = 2000;
 function doAction(type) {
-  if (gameOver || isLeaving || isOnToilet) return;
+  if (gameOver || isLeaving || isOnToilet || isPooped) return;
+  const now = Date.now();
+  if (now - lastActionTime < ACTION_COOLDOWN) return;
+  lastActionTime = now;
+  const btns = document.querySelectorAll('.action-btn');
+  btns.forEach(b => b.classList.add('cooldown'));
+  setTimeout(() => btns.forEach(b => b.classList.remove('cooldown')), ACTION_COOLDOWN);
 
   // Sleep/wake toggle
   if (type === 'sleep') { startSleep(); return; }
@@ -1131,6 +1338,8 @@ function addStars() {
 // ===== GAME OVER =====
 function triggerLeaving() {
   isLeaving = true;
+  needsToilet = false;
+  document.getElementById('toilet-request').classList.remove('show');
   wrap.classList.remove('idle');
   wrap.classList.add('leaving');
   showSpeech('angry');
@@ -1151,12 +1360,18 @@ function restartGame() {
   lowTimers = { food: 0, thirst: 0, love: 0 };
   gameOver = false;
   isLeaving = false;
+  lastActionTime = 0;
   startTime = Date.now();
   mood = 'happy';
   isEating = false; isDrinking = false; isPetting = false;
   isOnToilet = false;
   isSleeping = false;
   bladderPressure = 0;
+  needsToilet = false;
+  toiletRequestTime = 0;
+  isPooped = false;
+  if (buzzInterval) { clearInterval(buzzInterval); buzzInterval = null; }
+  hasSkullTattoo = false;
   tiredness = 0;
   tiredDemandTimer = 0;
   demandingSleep = false;
@@ -1165,6 +1380,12 @@ function restartGame() {
   wrap.classList.remove('leaving', 'sad-mood', 'angry-mood', 'eating', 'drinking', 'petting',
     'potty-walk', 'potty-return', 'sleeping');
   document.getElementById('toilet-screen').classList.remove('show');
+  document.getElementById('toilet-request').classList.remove('show');
+  document.getElementById('poop-indicator').classList.remove('show');
+  document.getElementById('clean-btn').classList.remove('show');
+  document.getElementById('skull-tattoo').classList.remove('show');
+  document.getElementById('tattoo-skull').style.display = '';
+  document.getElementById('tattoo-heart').style.display = 'none';
   document.getElementById('zzz-container').classList.remove('show');
   wrap.classList.add('idle');
   suitcase.classList.remove('show');
@@ -1280,6 +1501,19 @@ function gameLoop() {
     }
   });
 
+  // Skull tattoo - appears when love is low for too long
+  if (!hasSkullTattoo && lowTimers.love >= SKULL_TATTOO_TIME) {
+    hasSkullTattoo = true;
+    document.getElementById('skull-tattoo').classList.add('show');
+    document.getElementById('tattoo-skull').style.display = '';
+    document.getElementById('tattoo-heart').style.display = 'none';
+  }
+  // Swap skull to heart tattoo when love recovers
+  if (hasSkullTattoo && stats.love >= HIGH_STAT) {
+    document.getElementById('tattoo-skull').style.display = 'none';
+    document.getElementById('tattoo-heart').style.display = '';
+  }
+
   // Leaving check
   const allLow = stats.food < LOW_THRESHOLD && stats.thirst < LOW_THRESHOLD && stats.love < LOW_THRESHOLD;
   const maxLowTime = Math.max(lowTimers.food, lowTimers.thirst, lowTimers.love);
@@ -1296,7 +1530,13 @@ function gameLoop() {
 
   // Warning
   const warning = document.getElementById('warning');
-  if (demandingSleep) {
+  if (isPooped) {
+    warning.textContent = 'Furby had an accident! Clean up!';
+    warning.classList.add('show');
+  } else if (needsToilet) {
+    warning.textContent = `Take Furby to toilet! ${Math.ceil(toiletRequestTime)}s!`;
+    warning.classList.add('show');
+  } else if (demandingSleep) {
     warning.textContent = 'Furby is SO sleepy! Put him to bed!';
     warning.classList.add('show');
   } else if (allLow && maxLowTime > CRITICAL_TIME * 0.5) {
@@ -1321,11 +1561,23 @@ function gameLoop() {
   }
   updateBladderBar();
 
-  // Trigger toilet break
-  if (bladderPressure >= BLADDER_THRESHOLD) {
-    triggerToiletBreak();
-    requestAnimationFrame(gameLoop);
-    return;
+  // Trigger toilet request (player must click within TOILET_TIMEOUT seconds)
+  if (bladderPressure >= BLADDER_THRESHOLD && !needsToilet && !isPooped && !isOnToilet && !demandingSleep) {
+    showToiletRequest();
+  }
+
+  // Update toilet request countdown
+  if (needsToilet) {
+    toiletRequestTime -= cappedDt;
+    document.getElementById('toilet-countdown').textContent = Math.ceil(Math.max(0, toiletRequestTime));
+    if (toiletRequestTime <= 0) {
+      poopAccident();
+    }
+  }
+
+  // Extra love decay while pooped
+  if (isPooped) {
+    stats.love = Math.max(0, stats.love - DECAY_RATE.love * cappedDt * 2);
   }
 
   // Mood
