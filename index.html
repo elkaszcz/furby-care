@@ -218,17 +218,20 @@
   #suitcase-group.show { display: block; opacity: 1; }
 
   /* Toilet break */
-  #furby-wrap.potty-walk { animation: potty-walk 1.2s ease-in forwards; }
+  #furby-wrap.potty-walk { animation: potty-walk 1.8s ease-in-out forwards; }
   @keyframes potty-walk {
-    0%{transform:translateX(0);opacity:1}
-    80%{transform:translateX(-320px);opacity:1}
-    100%{transform:translateX(-350px);opacity:0}
+    0%{transform:translateX(0) scale(1);opacity:1}
+    60%{transform:translateX(-180px) scale(0.5);opacity:1}
+    85%{transform:translateX(-240px) scale(0.35);opacity:1}
+    95%{transform:translateX(-245px) scale(0.35);opacity:1}
+    100%{transform:translateX(-245px) scale(0.35);opacity:0}
   }
-  #furby-wrap.potty-return { animation: potty-return 1.2s ease-out forwards; }
+  #furby-wrap.potty-return { animation: potty-return 1.5s ease-out forwards; }
   @keyframes potty-return {
-    0%{transform:translateX(-350px);opacity:0}
-    20%{transform:translateX(-320px);opacity:1}
-    100%{transform:translateX(0);opacity:1}
+    0%{transform:translateX(-245px) scale(0.35);opacity:0}
+    5%{transform:translateX(-245px) scale(0.35);opacity:1}
+    40%{transform:translateX(-180px) scale(0.5);opacity:1}
+    100%{transform:translateX(0) scale(1);opacity:1}
   }
 
   #toilet-screen {
@@ -1009,13 +1012,16 @@ function triggerToiletBreak() {
   document.querySelectorAll('.action-btn').forEach(b => b.disabled = true);
   document.querySelectorAll('.room-tab').forEach(t => t.disabled = true);
 
+  // Show door first so Furby walks toward it
+  const toiletScreen = document.getElementById('toilet-screen');
+  toiletScreen.classList.add('show');
+
   wrap.classList.remove('idle');
   wrap.classList.add('potty-walk');
 
+  // Furby reaches the door and "enters" (1.8s walk)
   setTimeout(() => {
     el.classList.remove('show');
-    const toiletScreen = document.getElementById('toilet-screen');
-    toiletScreen.classList.add('show');
 
     const sfxEl = document.getElementById('toilet-sfx');
     const thoughtEl = document.getElementById('toilet-thought');
@@ -1054,11 +1060,11 @@ function triggerToiletBreak() {
         isOnToilet = false;
         document.querySelectorAll('.action-btn').forEach(b => b.disabled = false);
         document.querySelectorAll('.room-tab').forEach(t => t.disabled = false);
-      }, 1400);
+      }, 1600);
 
     }, 3500);
 
-  }, 1200);
+  }, 1800);
 }
 
 function updateBladderBar() {
